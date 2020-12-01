@@ -22,7 +22,6 @@ class UserController {
       let btn = this.formUpdateEl.querySelector("[type = submit]");
       btn.disable = true;
       let values = this.getValues(this.formUpdateEl);
-      console.log(values);
       let index = this.formUpdateEl.dataset.trIndex;
       let tr = this.tableEl.rows[index];
       tr.dataset.user = JSON.stringify(values);
@@ -49,45 +48,6 @@ class UserController {
     this.addEventsTr(tr);
     this.updateCount();
   } // fechando onEdit
-
-  // método addEventsTr
-  addEventsTr(tr) {
-    tr.querySelector(".btn-edit").addEventListener("click", (e) => {
-      console.log(tr);
-
-      let json = JSON.parse(tr.dataset.user);
-      let form = document.querySelector("#form-user-update");
-      form.dataset.trIndex = tr.sectionRowIndex;
-      alert("Section row index is: " + form.dataset.trIndex);
-      for (let name in json) {
-        let field = form.querySelector("[name=" + name.replace("_", "") + "]");
-
-        if (field) {
-          switch (field.type) {
-            case "file":
-              continue;
-              break;
-
-            case "radio":
-              field = form.querySelector(
-                "[name=" + name.replace("_", "") + "][value=" + json[name] + "]"
-              );
-              field.checked = true;
-              break;
-
-            case "checkbox":
-              field.checked = json[name];
-
-            default:
-              field.value = json[name];
-              break;
-          }
-        }
-      }
-
-      this.showPanelUpdate();
-    });
-  } // fechando addEventsTr
 
   // método onSubmit
   onSubmit() {
@@ -177,7 +137,7 @@ class UserController {
 
   // método addLine
   addLine(dataUser) {
-    console.log(dataUser);
+    // console.log(dataUser);
     let tr = document.createElement("tr");
     tr.dataset.user = JSON.stringify(dataUser);
     console.log("dataset: " + tr.dataset.user);
@@ -205,6 +165,48 @@ class UserController {
     this.tableEl.appendChild(tr);
     this.updateCount();
   } // fechando addLine
+
+  // método addEventsTr
+  addEventsTr(tr) {
+    tr.querySelector(".btn-edit").addEventListener("click", (e) => {
+      console.log(tr);
+
+      let json = JSON.parse(tr.dataset.user);
+      let form = document.querySelector("#form-user-update");
+      // this.formUpdateEl.dataset.trIndex = tr.sectionRowIndex;
+      alert("Section row index is: " + form.dataset.trIndex);
+      for (let name in json) {
+        //  let field = form.querySelector("[name=" + name.replace("_", "") + "]");
+        let field = this.formUpdateEl.querySelector(
+          "[name=" + name.replace("_", "") + "]"
+        );
+        if (field) {
+          switch (field.type) {
+            case "file":
+              continue;
+              break;
+
+            case "radio":
+              field = form.querySelector(
+                "[name=" + name.replace("_", "") + "][value=" + json[name] + "]"
+              );
+
+              field.checked = true;
+              break;
+
+            case "checkbox":
+              field.checked = json[name];
+
+            default:
+              field.value = json[name];
+              break;
+          }
+        }
+      }
+
+      this.showPanelUpdate();
+    });
+  } // fechando addEventsTr
 
   showPanelCreate() {
     document.querySelector("#box-user-create").style.display = "block";

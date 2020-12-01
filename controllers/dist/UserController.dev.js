@@ -46,7 +46,8 @@ function () {
 
         var values = _this.getValues(_this.formUpdateEl);
 
-        var index = _this.form.dataset.trIndex;
+        console.log(values);
+        var index = _this.formUpdateEl.dataset.trIndex;
         var tr = _this.tableEl.rows[index];
         tr.dataset.user = JSON.stringify(values);
         tr.innerHTML = "                  \n                      <td>\n                        <img src=\"".concat(values.photo, "\" alt=\"User Image\" class=\"img-circle img-sm\" />\n                      </td>\n                      <td>").concat(values.name, "</td>\n                      <td>").concat(values.email, "</td>\n                      <td>").concat(values.admin ? "Sim" : "Não", "</td>\n                      <td>").concat(Utils.dateFormat(values.register), "</td>\n                      <td>\n                        <button type=\"button\" class=\"btn btn-primary btn-edit btn-xs btn-flat\">\n                          Editar\n                        </button>\n                        <button type=\"button\" class=\"btn btn-danger btn-xs btn-flat\">\n                          Excluir\n                        </button>\n                      </td>\n                   ");
@@ -54,30 +55,71 @@ function () {
       this.addEventsTr(tr);
       this.updateCount();
     } // fechando onEdit
+    // método addEventsTr
+
+  }, {
+    key: "addEventsTr",
+    value: function addEventsTr(tr) {
+      var _this2 = this;
+
+      tr.querySelector(".btn-edit").addEventListener("click", function (e) {
+        console.log(tr);
+        var json = JSON.parse(tr.dataset.user);
+        var form = document.querySelector("#form-user-update");
+        form.dataset.trIndex = tr.sectionRowIndex;
+        alert("Section row index is: " + form.dataset.trIndex);
+
+        for (var name in json) {
+          var field = form.querySelector("[name=" + name.replace("_", "") + "]");
+
+          if (field) {
+            switch (field.type) {
+              case "file":
+                continue;
+                break;
+
+              case "radio":
+                field = form.querySelector("[name=" + name.replace("_", "") + "][value=" + json[name] + "]");
+                field.checked = true;
+                break;
+
+              case "checkbox":
+                field.checked = json[name];
+
+              default:
+                field.value = json[name];
+                break;
+            }
+          }
+        }
+
+        _this2.showPanelUpdate();
+      });
+    } // fechando addEventsTr
     // método onSubmit
 
   }, {
     key: "onSubmit",
     value: function onSubmit() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.formEl.addEventListener("submit", function (event) {
         event.preventDefault();
 
-        var btn = _this2.formEl.querySelector("[type = submit]");
+        var btn = _this3.formEl.querySelector("[type = submit]");
 
         btn.disable = true;
 
-        var values = _this2.getValues(_this2.formEl);
+        var values = _this3.getValues(_this3.formEl);
 
         if (!values) return false;
 
-        _this2.getPhoto().then(function (content) {
+        _this3.getPhoto().then(function (content) {
           values.photo = content;
 
-          _this2.addLine(values);
+          _this3.addLine(values);
 
-          _this2.formEl.reset();
+          _this3.formEl.reset();
 
           btn.disable = false;
         }, function (e) {
@@ -90,12 +132,12 @@ function () {
   }, {
     key: "getPhoto",
     value: function getPhoto() {
-      var _this3 = this;
+      var _this4 = this;
 
       return new Promise(function (resolve, reject) {
         var fileReader = new FileReader();
 
-        var elements = _toConsumableArray(_this3.formEl.elements).filter(function (item) {
+        var elements = _toConsumableArray(_this4.formEl.elements).filter(function (item) {
           if (item.name === "photo") {
             return item;
           }
@@ -163,47 +205,6 @@ function () {
       this.tableEl.appendChild(tr);
       this.updateCount();
     } // fechando addLine
-    // método addEventsTr
-
-  }, {
-    key: "addEventsTr",
-    value: function addEventsTr(tr) {
-      var _this4 = this;
-
-      tr.querySelector(".btn-edit").addEventListener("click", function (e) {
-        console.log(tr);
-        var json = JSON.parse(tr.dataset.user);
-        var form = document.querySelector("#form-user-update");
-        form.dataset.trIndex = tr.sectionRowIndex;
-        alert("Section row index is: " + form.dataset.trIndex);
-
-        for (var name in json) {
-          var field = form.querySelector("[name=" + name.replace("_", "") + "]");
-
-          if (field) {
-            switch (field.type) {
-              case "file":
-                continue;
-                break;
-
-              case "radio":
-                field = form.querySelector("[name=" + name.replace("_", "") + "][value=" + json[name] + "]");
-                field.checked = true;
-                break;
-
-              case "checkbox":
-                field.checked = json[name];
-
-              default:
-                field.value = json[name];
-                break;
-            }
-          }
-        }
-
-        _this4.showPanelUpdate();
-      });
-    } // fechando addEventsTr
 
   }, {
     key: "showPanelCreate",
