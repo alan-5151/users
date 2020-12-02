@@ -49,11 +49,35 @@ function () {
         console.log(values);
         var index = _this.formUpdateEl.dataset.trIndex;
         var tr = _this.tableEl.rows[index];
-        tr.dataset.user = JSON.stringify(values);
-        tr.innerHTML = "                  \n                      <td>\n                        <img src=\"".concat(values.photo, "\" alt=\"User Image\" class=\"img-circle img-sm\" />\n                      </td>\n                      <td>").concat(values.name, "</td>\n                      <td>").concat(values.email, "</td>\n                      <td>").concat(values.admin ? "Sim" : "Não", "</td>\n                      <td>").concat(Utils.dateFormat(values.register), "</td>\n                      <td>\n                        <button type=\"button\" class=\"btn btn-primary btn-edit btn-xs btn-flat\">\n                          Editar\n                        </button>\n                        <button type=\"button\" class=\"btn btn-danger btn-xs btn-flat\">\n                          Excluir\n                        </button>\n                      </td>\n                   ");
+        var userOld = JSON.parse(tr.dataset.user);
+        var result = Object.assign({}, userOld, values);
+
+        _this.addEventsTr(tr);
+
+        _this.getPhoto(_this.formUpdateEl).then(function (content) {
+          if (!values.photo) {
+            result._photo = userOld._photo;
+          } else {
+            result._photo = content;
+          }
+
+          tr.dataset.user = JSON.stringify(result); // console.log("tr.dataset.user: ", tr.dataset.user);
+
+          tr.innerHTML = "                  \n                      <td>\n                        <img src=\"".concat(result._photo, "\" alt=\"User Image\" class=\"img-circle img-sm\" />\n                      </td>\n                      <td>").concat(result._name, "</td>\n                      <td>").concat(result._email, "</td>\n                      <td>").concat(result._admin ? "Sim" : "Não", "</td>\n                      <td>").concat(Utils.dateFormat(result._register), "</td>\n                      <td>\n                        <button type=\"button\" class=\"btn btn-primary btn-edit btn-xs btn-flat\">\n                          Editar\n                        </button>\n                        <button type=\"button\" class=\"btn btn-danger btn-xs btn-flat\">\n                          Excluir\n                        </button>\n                      </td>\n                   ");
+        });
+
+        _this.addEventsTr(tr);
+
+        _this.updateCount();
+
+        _this.formUpdateEl.reset();
+
+        btn.disable = false;
+
+        _this.showPanelCreate();
+      }, function (e) {
+        console.error(e);
       });
-      this.addEventsTr(tr);
-      this.updateCount();
     } // fechando onEdit
     // método addEventsTr
 
@@ -65,12 +89,10 @@ function () {
       tr.querySelector(".btn-edit").addEventListener("click", function (e) {
         console.log(tr);
         var json = JSON.parse(tr.dataset.user);
-        var form = document.querySelector("#form-user-update");
-        form.dataset.trIndex = tr.sectionRowIndex;
-        alert("Section row index is: " + form.dataset.trIndex);
+        _this2.formUpdateEl.dataset.trIndex = tr.sectionRowIndex;
 
         for (var name in json) {
-          var field = form.querySelector("[name=" + name.replace("_", "") + "]");
+          var field = _this2.formUpdateEl.querySelector("[name=" + name.replace("_", "") + "]");
 
           if (field) {
             switch (field.type) {
@@ -79,7 +101,7 @@ function () {
                 break;
 
               case "radio":
-                field = form.querySelector("[name=" + name.replace("_", "") + "][value=" + json[name] + "]");
+                field = _this2.formUpdateEl.querySelector("[name=" + name.replace("_", "") + "][value=" + json[name] + "]");
                 field.checked = true;
                 break;
 
@@ -92,6 +114,8 @@ function () {
             }
           }
         }
+
+        _this2.formUpdateEl.querySelector(".photo").src = json._photo;
 
         _this2.showPanelUpdate();
       });
@@ -114,7 +138,7 @@ function () {
 
         if (!values) return false;
 
-        _this3.getPhoto().then(function (content) {
+        _this3.getPhoto(_this3.formEl).then(function (content) {
           values.photo = content;
 
           _this3.addLine(values);
@@ -131,13 +155,11 @@ function () {
 
   }, {
     key: "getPhoto",
-    value: function getPhoto() {
-      var _this4 = this;
-
+    value: function getPhoto(formEl) {
       return new Promise(function (resolve, reject) {
         var fileReader = new FileReader();
 
-        var elements = _toConsumableArray(_this4.formEl.elements).filter(function (item) {
+        var elements = _toConsumableArray(formEl.elements).filter(function (item) {
           if (item.name === "photo") {
             return item;
           }
