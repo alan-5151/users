@@ -63,7 +63,7 @@ function () {
 
           tr.dataset.user = JSON.stringify(result); // console.log("tr.dataset.user: ", tr.dataset.user);
 
-          tr.innerHTML = "                  \n                      <td>\n                        <img src=\"".concat(result._photo, "\" alt=\"User Image\" class=\"img-circle img-sm\" />\n                      </td>\n                      <td>").concat(result._name, "</td>\n                      <td>").concat(result._email, "</td>\n                      <td>").concat(result._admin ? "Sim" : "Não", "</td>\n                      <td>").concat(Utils.dateFormat(result._register), "</td>\n                      <td>\n                        <button type=\"button\" class=\"btn btn-primary btn-edit btn-xs btn-flat\">\n                          Editar\n                        </button>\n                        <button type=\"button\" class=\"btn btn-danger btn-xs btn-flat\">\n                          Excluir\n                        </button>\n                      </td>\n                   ");
+          tr.innerHTML = "                  \n                      <td>\n                        <img src=\"".concat(result._photo, "\" alt=\"User Image\" class=\"img-circle img-sm\" />\n                      </td>\n                      <td>").concat(result._name, "</td>\n                      <td>").concat(result._email, "</td>\n                      <td>").concat(result._admin ? "Sim" : "Não", "</td>\n                      <td>").concat(Utils.dateFormat(result._register), "</td>\n                      <td>\n                        <button type=\"button\" class=\"btn btn-primary btn-edit btn-xs btn-flat\">\n                          Editar\n                        </button>\n                        <button type=\"button\" class=\"btn btn-danger btn-delete btn-xs btn-flat\">\n                          Excluir\n                        </button>\n                      </td>\n                   ");
         });
 
         _this.addEventsTr(tr);
@@ -86,6 +86,13 @@ function () {
     value: function addEventsTr(tr) {
       var _this2 = this;
 
+      tr.querySelector(".btn-delete").addEventListener("click", function (e) {
+        if (confirm("Deseja excluir este usuário?")) {
+          tr.remove();
+
+          _this2.updateCount();
+        }
+      });
       tr.querySelector(".btn-edit").addEventListener("click", function (e) {
         console.log(tr);
         var json = JSON.parse(tr.dataset.user);
@@ -222,7 +229,7 @@ function () {
       var tr = document.createElement("tr");
       tr.dataset.user = JSON.stringify(dataUser);
       console.log("dataset: " + tr.dataset.user);
-      tr.innerHTML = "\n                   \n                      <td>\n                        <img src=\"".concat(dataUser.photo, "\" alt=\"User Image\" class=\"img-circle img-sm\" />\n                      </td>\n                      <td>").concat(dataUser.name, "</td>\n                      <td>").concat(dataUser.email, "</td>\n                      <td>").concat(dataUser.admin ? "Sim" : "Não", "</td>\n                      <td>").concat(Utils.dateFormat(dataUser.register), "</td>\n                      <td>\n                        <button type=\"button\" class=\"btn btn-primary btn-edit btn-xs btn-flat\">\n                          Editar\n                        </button>\n                        <button type=\"button\" class=\"btn btn-danger btn-xs btn-flat\">\n                          Excluir\n                        </button>\n                      </td>\n                   ");
+      tr.innerHTML = "\n                   \n                      <td>\n                        <img src=\"".concat(dataUser.photo, "\" alt=\"User Image\" class=\"img-circle img-sm\" />\n                      </td>\n                      <td>").concat(dataUser.name, "</td>\n                      <td>").concat(dataUser.email, "</td>\n                      <td>").concat(dataUser.admin ? "Sim" : "Não", "</td>\n                      <td>").concat(Utils.dateFormat(dataUser.register), "</td>\n                      <td>\n                        <button type=\"button\" class=\"btn btn-primary btn-edit btn-xs btn-flat\">\n                          Editar\n                        </button>\n                        <button type=\"button\" class=\"btn btn-danger btn-delete btn-xs btn-flat\">\n                          Excluir\n                        </button>\n                      </td>\n                   ");
       this.addEventsTr(tr);
       this.tableEl.appendChild(tr);
       this.updateCount();
