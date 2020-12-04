@@ -38,35 +38,16 @@ class UserController {
           } else {
             result._photo = content;
           }
-          tr.dataset.user = JSON.stringify(result);
-          // console.log("tr.dataset.user: ", tr.dataset.user);
-          tr.innerHTML = `                  
-                      <td>
-                        <img src="${
-                          result._photo
-                        }" alt="User Image" class="img-circle img-sm" />
-                      </td>
-                      <td>${result._name}</td>
-                      <td>${result._email}</td>
-                      <td>${result._admin ? "Sim" : "Não"}</td>
-                      <td>${Utils.dateFormat(result._register)}</td>
-                      <td>
-                        <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">
-                          Editar
-                        </button>
-                        <button type="button" class="btn btn-danger btn-delete btn-xs btn-flat">
-                          Excluir
-                        </button>
-                      </td>
-                   `;
+          let user = new User();
+          user.loadFromJSON(result);
+          this.getTr(user, tr);
+          this.updateCount();
+          this.formUpdateEl.reset();
+          btn.disable = false;
+          this.showPanelCreate();
         });
 
         this.addEventsTr(tr);
-        this.updateCount();
-
-        this.formUpdateEl.reset();
-        btn.disable = false;
-        this.showPanelCreate();
       },
       (e) => {
         console.error(e);
@@ -239,10 +220,25 @@ class UserController {
 
   // método addLine
   addLine(dataUser) {
-    console.log(dataUser);
-    let tr = document.createElement("tr");
+    let tr = this.getTr(dataUser);
+
+    this.tableEl.appendChild(tr);
+    this.updateCount();
+  } // fechando addLine
+
+  showPanelCreate() {
+    document.querySelector("#box-user-create").style.display = "block";
+    document.querySelector("#box-user-update").style.display = "none";
+  }
+  showPanelUpdate() {
+    document.querySelector("#box-user-create").style.display = "none";
+    document.querySelector("#box-user-update").style.display = "block";
+  }
+
+  // método getTr
+  getTr(dataUser, tr = null) {
+    if (tr === null) tr = document.createElement("tr");
     tr.dataset.user = JSON.stringify(dataUser);
-    console.log("dataset: " + tr.dataset.user);
     tr.innerHTML = `
                    
                       <td>
@@ -264,18 +260,8 @@ class UserController {
                       </td>
                    `;
     this.addEventsTr(tr);
-    this.tableEl.appendChild(tr);
-    this.updateCount();
-  } // fechando addLine
-
-  showPanelCreate() {
-    document.querySelector("#box-user-create").style.display = "block";
-    document.querySelector("#box-user-update").style.display = "none";
-  }
-  showPanelUpdate() {
-    document.querySelector("#box-user-create").style.display = "none";
-    document.querySelector("#box-user-update").style.display = "block";
-  }
+    return tr;
+  } // fechando getTr
 
   updateCount() {
     let numberUsers = 0;

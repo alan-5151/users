@@ -62,20 +62,21 @@ function () {
             result._photo = content;
           }
 
-          tr.dataset.user = JSON.stringify(result); // console.log("tr.dataset.user: ", tr.dataset.user);
+          var user = new User();
+          user.loadFromJSON(result);
 
-          tr.innerHTML = "                  \n                      <td>\n                        <img src=\"".concat(result._photo, "\" alt=\"User Image\" class=\"img-circle img-sm\" />\n                      </td>\n                      <td>").concat(result._name, "</td>\n                      <td>").concat(result._email, "</td>\n                      <td>").concat(result._admin ? "Sim" : "Não", "</td>\n                      <td>").concat(Utils.dateFormat(result._register), "</td>\n                      <td>\n                        <button type=\"button\" class=\"btn btn-primary btn-edit btn-xs btn-flat\">\n                          Editar\n                        </button>\n                        <button type=\"button\" class=\"btn btn-danger btn-delete btn-xs btn-flat\">\n                          Excluir\n                        </button>\n                      </td>\n                   ");
+          _this.getTr(user, tr);
+
+          _this.updateCount();
+
+          _this.formUpdateEl.reset();
+
+          btn.disable = false;
+
+          _this.showPanelCreate();
         });
 
         _this.addEventsTr(tr);
-
-        _this.updateCount();
-
-        _this.formUpdateEl.reset();
-
-        btn.disable = false;
-
-        _this.showPanelCreate();
       }, function (e) {
         console.error(e);
       });
@@ -266,12 +267,7 @@ function () {
   }, {
     key: "addLine",
     value: function addLine(dataUser) {
-      console.log(dataUser);
-      var tr = document.createElement("tr");
-      tr.dataset.user = JSON.stringify(dataUser);
-      console.log("dataset: " + tr.dataset.user);
-      tr.innerHTML = "\n                   \n                      <td>\n                        <img src=\"".concat(dataUser.photo, "\" alt=\"User Image\" class=\"img-circle img-sm\" />\n                      </td>\n                      <td>").concat(dataUser.name, "</td>\n                      <td>").concat(dataUser.email, "</td>\n                      <td>").concat(dataUser.admin ? "Sim" : "Não", "</td>\n                      <td>").concat(Utils.dateFormat(dataUser.register), "</td>\n                      <td>\n                        <button type=\"button\" class=\"btn btn-primary btn-edit btn-xs btn-flat\">\n                          Editar\n                        </button>\n                        <button type=\"button\" class=\"btn btn-danger btn-delete btn-xs btn-flat\">\n                          Excluir\n                        </button>\n                      </td>\n                   ");
-      this.addEventsTr(tr);
+      var tr = this.getTr(dataUser);
       this.tableEl.appendChild(tr);
       this.updateCount();
     } // fechando addLine
@@ -287,7 +283,19 @@ function () {
     value: function showPanelUpdate() {
       document.querySelector("#box-user-create").style.display = "none";
       document.querySelector("#box-user-update").style.display = "block";
-    }
+    } // método getTr
+
+  }, {
+    key: "getTr",
+    value: function getTr(dataUser) {
+      var tr = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      if (tr === null) tr = document.createElement("tr");
+      tr.dataset.user = JSON.stringify(dataUser);
+      tr.innerHTML = "\n                   \n                      <td>\n                        <img src=\"".concat(dataUser.photo, "\" alt=\"User Image\" class=\"img-circle img-sm\" />\n                      </td>\n                      <td>").concat(dataUser.name, "</td>\n                      <td>").concat(dataUser.email, "</td>\n                      <td>").concat(dataUser.admin ? "Sim" : "Não", "</td>\n                      <td>").concat(Utils.dateFormat(dataUser.register), "</td>\n                      <td>\n                        <button type=\"button\" class=\"btn btn-primary btn-edit btn-xs btn-flat\">\n                          Editar\n                        </button>\n                        <button type=\"button\" class=\"btn btn-danger btn-delete btn-xs btn-flat\">\n                          Excluir\n                        </button>\n                      </td>\n                   ");
+      this.addEventsTr(tr);
+      return tr;
+    } // fechando getTr
+
   }, {
     key: "updateCount",
     value: function updateCount() {
