@@ -26,6 +26,7 @@ function () {
     this.tableEl = document.getElementById(tableId);
     this.onSubmit();
     this.onEdit();
+    this.selectAll();
   } // método onEdit
 
 
@@ -148,6 +149,8 @@ function () {
         _this3.getPhoto(_this3.formEl).then(function (content) {
           values.photo = content;
 
+          _this3.insert(values);
+
           _this3.addLine(values);
 
           _this3.formEl.reset();
@@ -220,6 +223,44 @@ function () {
 
       return new User(user.name, user.gender, user.birth, user.country, user.email, user.password, user.photo, user.admin);
     } // fechando getValues
+    // método getUsersStorage
+
+  }, {
+    key: "getUsersStorage",
+    value: function getUsersStorage() {
+      var users = [];
+
+      if (localStorage.getItem("users")) {
+        users = JSON.parse(localStorage.getItem("users"));
+      }
+
+      return users;
+    } // fechando getUsersStorage
+    // método selectAll
+
+  }, {
+    key: "selectAll",
+    value: function selectAll() {
+      var _this4 = this;
+
+      var users = this.getUsersStorage();
+      users.forEach(function (dataUser) {
+        var user = new User();
+        user.loadFromJSON(dataUser);
+
+        _this4.addLine(user);
+      });
+    } // fechando selectAll
+    // método insert
+
+  }, {
+    key: "insert",
+    value: function insert(data) {
+      var users = this.getUsersStorage();
+      users.push(data); // sessionStorage.setItem("users", JSON.stringify(users));
+
+      localStorage.setItem("users", JSON.stringify(users));
+    } //fechando insert
     // método addLine
 
   }, {
