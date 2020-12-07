@@ -12,6 +12,7 @@ function () {
   function User(name, gender, birth, country, email, password, photo, admin) {
     _classCallCheck(this, User);
 
+    this._id;
     this._name = name;
     this._gender = gender;
     this._birth = birth;
@@ -37,6 +38,58 @@ function () {
             break;
         }
       }
+    }
+  }, {
+    key: "getNewId",
+    value: function getNewId() {
+      var usersID = parseInt(localStorage.getItem("usersID"));
+      if (!usersID > 0) usersID = 0;
+      usersID++;
+      localStorage.setItem("usersID", usersID);
+      return usersID;
+    } // método getUsersStorage
+
+  }, {
+    key: "save",
+    // fechando getUsersStorage
+    value: function save() {
+      var _this = this;
+
+      var users = User.getUsersStorage();
+
+      if (this.id > 0) {
+        users = users.map(function (u) {
+          if (u._id == _this.id) {
+            // Object.assign(u, this);
+            u = _this;
+          }
+
+          return u;
+        });
+      } else {
+        this._id = this.getNewId();
+        users.push(this);
+      }
+
+      localStorage.setItem("users", JSON.stringify(users));
+    }
+  }, {
+    key: "apagar",
+    value: function apagar() {
+      var _this2 = this;
+
+      var users = User.getUsersStorage();
+      users.forEach(function (userData, index) {
+        if (_this2._id == userData._id) {
+          users.splice(index, 1);
+        }
+      });
+      localStorage.setItem("users", JSON.stringify(users));
+    }
+  }, {
+    key: "id",
+    get: function get() {
+      return this._id;
     }
   }, {
     key: "name",
@@ -85,6 +138,17 @@ function () {
     key: "register",
     get: function get() {
       return this._register;
+    }
+  }], [{
+    key: "getUsersStorage",
+    value: function getUsersStorage() {
+      var users = [];
+
+      if (localStorage.getItem("users")) {
+        users = JSON.parse(localStorage.getItem("users"));
+      }
+
+      return users;
     }
   }]);
 

@@ -64,6 +64,7 @@ function () {
 
           var user = new User();
           user.loadFromJSON(result);
+          user.save();
 
           _this.getTr(user, tr);
 
@@ -90,6 +91,9 @@ function () {
 
       tr.querySelector(".btn-delete").addEventListener("click", function (e) {
         if (confirm("Deseja excluir este usuário?")) {
+          var user = new User();
+          user.loadFromJSON(JSON.parse(tr.dataset.user));
+          user.apagar();
           tr.remove();
 
           _this2.updateCount();
@@ -149,8 +153,7 @@ function () {
 
         _this3.getPhoto(_this3.formEl).then(function (content) {
           values.photo = content;
-
-          _this3.insert(values);
+          values.save();
 
           _this3.addLine(values);
 
@@ -224,19 +227,6 @@ function () {
 
       return new User(user.name, user.gender, user.birth, user.country, user.email, user.password, user.photo, user.admin);
     } // fechando getValues
-    // método getUsersStorage
-
-  }, {
-    key: "getUsersStorage",
-    value: function getUsersStorage() {
-      var users = [];
-
-      if (localStorage.getItem("users")) {
-        users = JSON.parse(localStorage.getItem("users"));
-      }
-
-      return users;
-    } // fechando getUsersStorage
     // método selectAll
 
   }, {
@@ -244,7 +234,7 @@ function () {
     value: function selectAll() {
       var _this4 = this;
 
-      var users = this.getUsersStorage();
+      var users = User.getUsersStorage();
       users.forEach(function (dataUser) {
         var user = new User();
         user.loadFromJSON(dataUser);
@@ -252,16 +242,6 @@ function () {
         _this4.addLine(user);
       });
     } // fechando selectAll
-    // método insert
-
-  }, {
-    key: "insert",
-    value: function insert(data) {
-      var users = this.getUsersStorage();
-      users.push(data); // sessionStorage.setItem("users", JSON.stringify(users));
-
-      localStorage.setItem("users", JSON.stringify(users));
-    } //fechando insert
     // método addLine
 
   }, {

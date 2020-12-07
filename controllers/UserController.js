@@ -40,6 +40,7 @@ class UserController {
           }
           let user = new User();
           user.loadFromJSON(result);
+          user.save();
           this.getTr(user, tr);
           this.updateCount();
           this.formUpdateEl.reset();
@@ -59,7 +60,12 @@ class UserController {
   addEventsTr(tr) {
     tr.querySelector(".btn-delete").addEventListener("click", (e) => {
       if (confirm("Deseja excluir este usuário?")) {
+        let user = new User();
+        user.loadFromJSON(JSON.parse(tr.dataset.user));
+        user.apagar();
+
         tr.remove();
+
         this.updateCount();
       }
     });
@@ -115,7 +121,7 @@ class UserController {
       this.getPhoto(this.formEl).then(
         (content) => {
           values.photo = content;
-          this.insert(values);
+          values.save();
           this.addLine(values);
           this.formEl.reset();
           btn.disable = false;
@@ -190,18 +196,9 @@ class UserController {
     );
   } // fechando getValues
 
-  // método getUsersStorage
-  getUsersStorage() {
-    let users = [];
-    if (localStorage.getItem("users")) {
-      users = JSON.parse(localStorage.getItem("users"));
-    }
-    return users;
-  } // fechando getUsersStorage
-
   // método selectAll
   selectAll() {
-    let users = this.getUsersStorage();
+    let users = User.getUsersStorage();
 
     users.forEach((dataUser) => {
       let user = new User();
@@ -209,14 +206,6 @@ class UserController {
       this.addLine(user);
     });
   } // fechando selectAll
-
-  // método insert
-  insert(data) {
-    let users = this.getUsersStorage();
-    users.push(data);
-    // sessionStorage.setItem("users", JSON.stringify(users));
-    localStorage.setItem("users", JSON.stringify(users));
-  } //fechando insert
 
   // método addLine
   addLine(dataUser) {
